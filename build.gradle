@@ -1,0 +1,120 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'org.springframework.boot' version '2.7.17'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id "org.flywaydb.flyway" version "5.2.1"
+}
+
+// read environment variables
+apply from: 'env.gradle'
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '21'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs
+    implementation('org.springframework.security:spring-security-taglibs')
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
+    implementation 'org.springframework.session:spring-session-data-redis'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    annotationProcessor 'org.projectlombok:lombok'
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.amqp:spring-rabbit-test'
+    testImplementation 'org.springframework.batch:spring-batch-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.apache.poi:poi:5.2.2'
+    implementation 'org.apache.poi:poi-ooxml:5.2.2'
+    implementation 'org.apache.poi:poi-ooxml:5.2.2'
+
+    implementation group: 'joda-time', name: 'joda-time', version: '2.3'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation('org.apache.commons:commons-lang3:3.12.0')
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+    implementation('org.apache.commons:commons-collections4:4.4')
+
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+    implementation('org.apache.httpcomponents:httpclient:4.5.14')
+
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpmime
+    implementation('org.apache.httpcomponents:httpmime:4.5.14')
+
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation('commons-io:commons-io:2.11.0')
+
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation('org.json:json:20230227')
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+bootRun {
+    jvmArgs = project.PROP_JVMARGS
+
+}
+if (file('/src/main/resources/application-dev.properties').exists()) {
+
+    def props = new Properties()
+    file('/src/main/resources/application-dev.properties').withInputStream {
+        stream -> props.load(stream)
+
+    }
+
+    def config = new ConfigSlurper().parse(props)
+    project.ext.config = config // for gradle 2.+
+
+    System.out.println("Using datasourcce.url: $config.spring.datasource.url")
+    /**
+     * db migration tool
+     * https://flywaydb.org/documentation/gradle/
+     */
+    flyway {
+        url = "$config.spring.datasource.url"
+        user = "$config.spring.datasource.username"
+        password = "$config.spring.datasource.password"
+        encoding = "UTF-8"
+        placeholderPrefix = '#['
+        placeholderSuffix = ']'
+        sqlMigrationPrefix = "v"
+    }
+
+    task flywayQuick(description: "One-click migrate the schema to the last version.") {
+        doLast {
+            print "Execute tasks flywayClean ........"
+            tasks.flywayClean.execute()
+            println "[Completed]"
+            print "Execute tasks flywayMigrate ........"
+            tasks.flywayMigrate.execute()
+            println "[Completed]"
+        }
+    }
+}
