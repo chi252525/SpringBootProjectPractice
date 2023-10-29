@@ -1,0 +1,22 @@
+/*
+ * https://flywaydb.org/documentation/gradle/
+ * https://flywaydb.org/documentation/configfiles
+ *
+ * Rename flyway.gradle.sample to flyway.gradle
+ * Modify following properties to your target database.
+*/
+
+project.ext {
+    flyway.url = 'jdbc:mysql://localhost:3306?useSSL=false&characterEncoding=utf8&characterSetResults=utf8'
+    flyway.schemas = ['demo']
+    flyway.user = 'root'
+    flyway.password = 'root'
+}
+
+// DEV
+//project.ext {
+//    flyway.url = 'jdbc:mysql://dev-dm-mmsbu101z.dev.jp.local:3301?useSSL=false&characterEncoding=utf8&characterSetResults=utf8'
+//    flyway.schemas = ['demo']
+//    flyway.user = 'erp_admin'
+//    flyway.password = 'XPr7_a3fBvstad'
+//}
