@@ -32,11 +32,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.projectlombok:lombok:1.18.26'
+    implementation 'com.zaxxer:HikariCP:5.0.1'
+    implementation 'org.springframework.retry:spring-retry:2.0.0'
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs
     implementation('org.springframework.security:spring-security-taglibs')
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-core:9.16.0'
     implementation 'org.flywaydb:flyway-mysql'
     implementation 'org.springframework.session:spring-session-data-redis'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
@@ -52,6 +55,7 @@ dependencies {
     implementation 'org.apache.poi:poi:5.2.2'
     implementation 'org.apache.poi:poi-ooxml:5.2.2'
     implementation 'org.apache.poi:poi-ooxml:5.2.2'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.5'
 
     implementation group: 'joda-time', name: 'joda-time', version: '2.3'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
@@ -71,6 +75,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.json/json
     implementation('org.json:json:20230227')
+    implementation 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
 
 }
 
@@ -104,7 +109,7 @@ if (file('/src/main/resources/application-dev.properties').exists()) {
         encoding = "UTF-8"
         placeholderPrefix = '#['
         placeholderSuffix = ']'
-        sqlMigrationPrefix = "v"
+        sqlMigrationPrefix = "V"
     }
 
     task flywayQuick(description: "One-click migrate the schema to the last version.") {
